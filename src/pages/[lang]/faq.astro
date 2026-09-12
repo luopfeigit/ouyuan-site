@@ -1,0 +1,103 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import LeadForm from '../../components/LeadForm.astro';
+import WhatsAppFloating from '../../components/WhatsAppFloating.astro';
+import { translations, supportedLanguages } from '../../lib/i18n';
+
+export async function getStaticPaths() {
+  return supportedLanguages.map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params;
+const currentLang = lang || 'en';
+const t = translations[currentLang]?.faqPage || translations['en'].faqPage;
+const leadContent = translations[currentLang]?.leadForm || translations['en'].leadForm;
+
+// 提取所有问答对用于注入 Google Schema.org FAQPage 结构化标记
+const allFaqItems = t.categories.flatMap((cat: any) => cat.items);
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": allFaqItems.map((item: any) => ({
+    "@type": "Question",
+    "name": item.q,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": item.a
+    }
+  }))
+};
+---
+
+<BaseLayout title={t.seo.title} description={t.seo.description} lang={currentLang}>
+  <!-- 注入 Google 富文本 FAQPage Schema -->
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+
+  <!-- 1. Hero 顶部横幅 -->
+  <section class="relative bg-slate-950 text-white pt-24 pb-16 overflow-hidden border-b border-slate-800">
+    <div class="absolute inset-0 bg-[linear-gradient(to_right,#1e293b15_1px,transparent_1px),linear-gradient(to_bottom,#1e293b15_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none"></div>
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[35rem] h-[35rem] bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+      <span class="inline-block bg-blue-600/20 text-blue-400 border border-blue-500/30 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-6 font-mono">
+        {t.badge}
+      </span>
+      <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white max-w-4xl mx-auto leading-tight">
+        {t.title}
+      </h1>
+      <p class="mt-6 text-base sm:text-lg text-slate-400 max-w-3xl mx-auto leading-relaxed">
+        {t.subtitle}
+      </p>
+    </div>
+  </section>
+
+  <!-- 2. 分类折叠问答主体 -->
+  <section class="py-20 bg-slate-900/40 border-b border-slate-800">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+      {t.categories.map((category: any) => (
+        <div class="space-y-6">
+          <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
+            <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+            <h2 class="text-xl font-bold text-white tracking-tight">{category.name}</h2>
+          </div>
+
+          <div class="space-y-4">
+            {category.items.map((item: any) => (
+              <details class="group bg-slate-900 border border-slate-800 rounded-2xl transition duration-200 overflow-hidden hover:border-slate-700">
+                <summary class="flex justify-between items-center p-6 cursor-pointer font-bold text-white text-base select-none list-none">
+                  <span class="pr-6 leading-snug">{item.q}</span>
+                  <span class="w-8 h-8 rounded-xl bg-slate-800 flex items-center justify-center text-slate-400 group-open:rotate-180 group-open:bg-blue-600 group-open:text-white transition duration-300 shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </span>
+                </summary>
+                <div class="px-6 pb-6 text-xs sm:text-sm text-slate-400 leading-relaxed border-t border-slate-800/40 pt-4">
+                  {item.a}
+                </div>
+              </details>
+            ))}
+          </div>
+        </div>
+      ))}
+
+      <!-- 快速答疑横幅 -->
+      <div class="bg-gradient-to-r from-blue-950/60 to-slate-900 border border-blue-900/40 rounded-3xl p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div class="space-y-2 text-center sm:text-left">
+          <h3 class="text-lg font-bold text-white">{t.stillHaveQuestions}</h3>
+          <p class="text-xs text-slate-400 max-w-lg">{t.stillHaveQuestionsDesc}</p>
+        </div>
+        <a 
+          href="#contact-form" 
+          class="shrink-0 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-6 py-3.5 rounded-xl shadow-lg shadow-blue-500/20 transition"
+        >
+          {t.contactBtn} →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. 底部商业询盘表单与悬浮组件 -->
+  <LeadForm content={leadContent} />
+  <WhatsAppFloating />
+</BaseLayout>

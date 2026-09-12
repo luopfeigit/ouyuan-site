@@ -1,0 +1,197 @@
+---
+interface Props {
+  content: any;
+}
+
+const { content } = Astro.props;
+---
+
+<section id="contact-form" class="py-20 bg-gradient-to-b from-blue-50/60 to-white relative overflow-hidden border-t border-slate-200">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+      
+      <!-- 左侧：公司资质与即时联系方式 -->
+      <div class="lg:col-span-5 space-y-6">
+        <span class="inline-block bg-blue-100 text-blue-700 border border-blue-200 text-xs font-bold uppercase tracking-widest px-3.5 py-1.5 rounded-full font-mono">
+          {content.badge}
+        </span>
+
+        <h2 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight leading-tight">
+          {content.leftTitle}
+        </h2>
+
+        <p class="text-sm text-slate-600 leading-relaxed">
+          {content.leftDesc}
+        </p>
+
+        <div class="pt-6 border-t border-slate-200 space-y-4">
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 font-bold">
+              🏢
+            </div>
+            <div>
+              <div class="text-xs text-slate-400 uppercase tracking-wider font-semibold">{content.companyLabel}</div>
+              <div class="text-sm font-bold text-slate-800">{content.companyName}</div>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 font-bold">
+              💬
+            </div>
+            <div>
+              <div class="text-xs text-slate-400 uppercase tracking-wider font-semibold">{content.phoneLabel}</div>
+              <div class="text-sm font-bold text-slate-800 font-mono">{content.phoneValue}</div>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 font-bold">
+              ✉️
+            </div>
+            <div>
+              <div class="text-xs text-slate-400 uppercase tracking-wider font-semibold">{content.emailLabel}</div>
+              <div class="text-sm font-bold text-slate-800 font-mono">{content.emailValue}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-full px-4 py-2 text-xs font-semibold text-blue-700">
+          <span class="w-2 h-2 rounded-full bg-blue-600 animate-ping"></span>
+          <span>{content.slaBadge}</span>
+        </div>
+      </div>
+
+      <!-- 右侧：纯白高质感留资卡片 -->
+      <div class="lg:col-span-7">
+        <div class="bg-white border border-slate-200 rounded-3xl p-8 sm:p-10 shadow-xl shadow-blue-900/5">
+          <h3 class="text-xl font-bold text-slate-900 mb-6 tracking-tight">
+            {content.formTitle}
+          </h3>
+
+          <form id="quote-lead-form" action="https://formspree.io/f/mqaeeyrk" method="POST" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1.5">Full Name *</label>
+                <input 
+                  type="text" 
+                  name="name" 
+                  required 
+                  placeholder={content.namePlaceholder} 
+                  class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-xs placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white transition"
+                />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1.5">Business Email *</label>
+                <input 
+                  type="email" 
+                  name="email" 
+                  required 
+                  placeholder={content.emailPlaceholder} 
+                  class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-xs placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white transition"
+                />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1.5">Phone / WhatsApp *</label>
+                <input 
+                  type="tel" 
+                  name="phone" 
+                  required 
+                  placeholder={content.phonePlaceholder} 
+                  class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-xs placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white transition"
+                />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1.5">Destination Country *</label>
+                <input 
+                  type="text" 
+                  name="country" 
+                  required 
+                  placeholder={content.countryPlaceholder} 
+                  class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-xs placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white transition"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1.5">{content.modelLabel}</label>
+              <select 
+                name="interested_model" 
+                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-xs focus:outline-none focus:border-blue-600 focus:bg-white transition"
+              >
+                {content.modelOptions.map((opt: string) => (
+                  <option value={opt}>{opt}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1.5">Requirements / Message</label>
+              <textarea 
+                name="message" 
+                rows="3" 
+                placeholder={content.messagePlaceholder}
+                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-xs placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white transition"
+              ></textarea>
+            </div>
+
+            <button 
+              type="submit" 
+              id="lead-submit-btn"
+              class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider py-4 rounded-xl shadow-lg shadow-blue-500/20 transition duration-200"
+            >
+              {content.submitBtn}
+            </button>
+
+            <div id="lead-status" class="hidden text-center text-xs pt-2"></div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  const form = document.getElementById('quote-lead-form');
+  const submitBtn = document.getElementById('lead-submit-btn');
+  const statusDiv = document.getElementById('lead-status');
+
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!submitBtn || !statusDiv) return;
+
+      const originalText = submitBtn.innerText;
+      submitBtn.innerText = 'Submitting...';
+      submitBtn.setAttribute('disabled', 'true');
+
+      try {
+        const formData = new FormData(form);
+        const res = await fetch(form.action, {
+          method: 'POST',
+          body: formData,
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (res.ok) {
+          form.reset();
+          statusDiv.innerText = '✓ Inquiry received. We will contact you within 24 hours.';
+          statusDiv.className = 'text-center text-xs pt-2 text-emerald-600 font-bold block';
+        } else {
+          statusDiv.innerText = 'Error submitting inquiry. Please email sales@ouyuan.id directly.';
+          statusDiv.className = 'text-center text-xs pt-2 text-rose-600 font-bold block';
+        }
+      } catch (err) {
+        statusDiv.innerText = 'Network error. Please email sales@ouyuan.id directly.';
+        statusDiv.className = 'text-center text-xs pt-2 text-rose-600 font-bold block';
+      } finally {
+        submitBtn.innerText = originalText;
+        submitBtn.removeAttribute('disabled');
+      }
+    });
+  }
+</script>

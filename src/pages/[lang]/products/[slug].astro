@@ -1,0 +1,242 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import LeadForm from '../../../components/LeadForm.astro';
+import WhatsAppFloating from '../../../components/WhatsAppFloating.astro';
+import { translations, supportedLanguages } from '../../../lib/i18n';
+import { fetchFromWP, GET_MACHINES_QUERY, GET_MACHINE_BY_SLUG } from '../../../lib/wp';
+
+export async function getStaticPaths() {
+  // 直接在 getStaticPaths 作用域内声明兜底机型 Slug 列表
+  const defaultSlugs = [
+    '4th-gen-flagship-series-oytk2504-2',
+    'commercial-standard-single-chamber-oytk2501-1',
+    'transit-compact-wall-mounted-oytk2502-w',
+  ];
+
+  let slugs = defaultSlugs;
+
+  // 尝试从 WordPress GraphQL 获取线上 Slug
+  try {
+    const data = await fetchFromWP(GET_MACHINES_QUERY);
+    if (data?.posts?.nodes?.length) {
+      slugs = data.posts.nodes.map((node: any) => node.slug);
+    }
+  } catch (e) {
+    slugs = defaultSlugs;
+  }
+
+  const paths = [];
+  for (const lang of supportedLanguages) {
+    for (const slug of slugs) {
+      paths.push({
+        params: { lang, slug },
+      });
+    }
+  }
+  return paths;
+}
+
+// 离线兜底机型详细参数配置
+const FALLBACK_DETAILS: Record<string, any> = {
+  '4th-gen-flagship-series-oytk2504-2': {
+    title: '4th-Gen Dual-Chamber Flagship Sanitizer (OYTK2504-2)',
+    modelNo: 'OYTK2504-2',
+    capacity: '2 Helmets Simultaneously',
+    cycleTime: '3 Minutes Rapid Sterilization',
+    disinfectionTech: 'Medical Ozone (O3) + 253.7nm UV-C + 50°C Warm Air Vortex',
+    powerRating: '220V / 50Hz, 1200W Peak',
+    dimensions: '850mm × 650mm × 1850mm',
+    weight: '145 kg',
+    waterStorage: '15L Clean / 15L Waste (Plumbing Bypass Available)',
+    paymentSupport: 'Dynamic QRIS, Coin Validator, Banknote Acceptor, Contactless POS',
+    description: 'High-throughput dual-chamber automatic helmet washing and sterilization station designed for high-density petrol stations, transit hubs, and commercial delivery hubs.',
+  },
+  'commercial-standard-single-chamber-oytk2501-1': {
+    title: 'Commercial Standard Single-Chamber Sanitizer (OYTK2501-1)',
+    modelNo: 'OYTK2501-1',
+    capacity: '1 Helmet per Cycle',
+    cycleTime: '3 - 5 Minutes Adjustable',
+    disinfectionTech: 'Ozone + Warm Air + UV-C',
+    powerRating: '220V / 50Hz, 800W',
+    dimensions: '600mm × 550mm × 1700mm',
+    weight: '95 kg',
+    waterStorage: '10L Dual Tanks',
+    paymentSupport: 'QRIS / Coin / Banknote',
+    description: 'Cost-effective commercial helmet sanitization solution with compact footprint and complete unattended IoT telemetry.',
+  },
+  'transit-compact-wall-mounted-oytk2502-w': {
+    title: 'Transit Compact Wall-Mounted Kiosk (OYTK2502-W)',
+    modelNo: 'OYTK2502-W',
+    capacity: '1 Helmet per Cycle',
+    cycleTime: '3 Minutes Express Disinfection',
+    disinfectionTech: 'Dry Mist + UV-C Radiation',
+    powerRating: '220V / 50Hz, 500W',
+    dimensions: '500mm × 450mm × 850mm',
+    weight: '48 kg',
+    waterStorage: 'Direct In-line Connection',
+    paymentSupport: 'RFID / NFC Card Reader / Cloud QR',
+    description: 'Ultra-compact wall-mounted or desktop sanitizing station engineered for office buildings, motorcycle dealerships, and courier lockers.',
+  },
+};
+
+const { lang, slug } = Astro.params;
+const currentLang = lang || 'en';
+const currentSlug = slug || '4th-gen-flagship-series-oytk2504-2';
+
+// 获取机型详情
+let productData = null;
+try {
+  const remoteDetail = await fetchFromWP(GET_MACHINE_BY_SLUG, { slug: currentSlug });
+  if (remoteDetail?.post) {
+    productData = {
+      title: remoteDetail.post.title,
+      description: remoteDetail.post.content?.replace(/<[^>]+>/g, '') || '',
+      ...(FALLBACK_DETAILS[currentSlug] || FALLBACK_DETAILS['4th-gen-flagship-series-oytk2504-2']),
+    };
+  }
+} catch (e) {
+  productData = null;
+}
+
+if (!productData) {
+  productData = FALLBACK_DETAILS[currentSlug] || FALLBACK_DETAILS['4th-gen-flagship-series-oytk2504-2'];
+}
+
+const leadContent = translations[currentLang]?.leadForm || translations['en']?.leadForm;
+
+const productSchema = {
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": productData.title,
+  "description": productData.description,
+  "sku": productData.modelNo,
+  "brand": {
+    "@type": "Brand",
+    "name": "OUYUAN"
+  },
+  "offers": {
+    "@type": "AggregateOffer",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock",
+    "itemCondition": "https://schema.org/NewCondition"
+  }
+};
+---
+
+<BaseLayout 
+  title={`${productData.title} | Factory Direct OUYUAN`} 
+  description={productData.description.slice(0, 150)} 
+  lang={currentLang}
+>
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(productSchema)} />
+
+  <section class="py-16 bg-slate-50 border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- 面包屑导航 -->
+      <nav class="flex items-center gap-2 text-xs text-slate-500 font-mono mb-8">
+        <a href={`/${currentLang}/`} class="hover:text-blue-600 transition">Home</a>
+        <span>/</span>
+        <a href={`/${currentLang}/products/`} class="hover:text-blue-600 transition">Products</a>
+        <span>/</span>
+        <span class="text-slate-900 font-bold">{productData.modelNo}</span>
+      </nav>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+        
+        <!-- 左侧：产品主图占位与资质勋章 -->
+        <div class="lg:col-span-6 bg-white border border-slate-200 rounded-3xl p-8 shadow-sm">
+          <div class="aspect-square bg-gradient-to-tr from-slate-100 to-blue-50/50 rounded-2xl flex flex-col items-center justify-center border border-slate-200/60 relative overflow-hidden">
+            <div class="w-32 h-32 rounded-3xl bg-blue-600/10 text-blue-600 flex items-center justify-center font-black text-4xl mb-4 shadow-inner">
+              OY
+            </div>
+            <span class="font-mono text-sm font-bold text-slate-800">{productData.modelNo}</span>
+            <span class="text-xs text-slate-400 mt-1">Direct Factory Production Unit</span>
+            
+            <div class="absolute bottom-4 left-4 right-4 flex justify-center gap-3 text-[11px] font-mono text-slate-500 bg-white/90 backdrop-blur-sm py-2 px-4 rounded-xl border border-slate-200/80 shadow-sm">
+              <span>✓ ISO9001</span>
+              <span>•</span>
+              <span>✓ CE Verified</span>
+              <span>•</span>
+              <span>✓ 24M Warranty</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右侧：核心技术参数与行动按钮 -->
+        <div class="lg:col-span-6 space-y-6">
+          <div>
+            <span class="inline-block bg-blue-100 text-blue-700 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full font-mono mb-3">
+              Model: {productData.modelNo}
+            </span>
+            <h1 class="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight leading-tight">
+              {productData.title}
+            </h1>
+          </div>
+
+          <p class="text-sm text-slate-600 leading-relaxed">
+            {productData.description}
+          </p>
+
+          <!-- 工业技术规格对照表 -->
+          <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-3 font-mono text-xs">
+            <div class="flex justify-between py-2 border-b border-slate-100">
+              <span class="text-slate-400">Processing Capacity</span>
+              <span class="font-bold text-slate-800">{productData.capacity}</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-slate-100">
+              <span class="text-slate-400">Standard Cycle Duration</span>
+              <span class="font-bold text-blue-600">{productData.cycleTime}</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-slate-100">
+              <span class="text-slate-400">Disinfection Spectrum</span>
+              <span class="font-bold text-slate-800">{productData.disinfectionTech}</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-slate-100">
+              <span class="text-slate-400">Power Rating</span>
+              <span class="font-bold text-slate-800">{productData.powerRating}</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-slate-100">
+              <span class="text-slate-400">Machine Dimensions</span>
+              <span class="font-bold text-slate-800">{productData.dimensions}</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-slate-100">
+              <span class="text-slate-400">Operational Weight</span>
+              <span class="font-bold text-slate-800">{productData.weight}</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-slate-100">
+              <span class="text-slate-400">Water Circulation</span>
+              <span class="font-bold text-slate-800">{productData.waterStorage}</span>
+            </div>
+            <div class="flex justify-between py-2">
+              <span class="text-slate-400">Payment Compatibility</span>
+              <span class="font-bold text-emerald-600">{productData.paymentSupport}</span>
+            </div>
+          </div>
+
+          <div class="pt-4 flex flex-wrap gap-4">
+            <a 
+              href="#contact-form" 
+              class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider px-8 py-4 rounded-xl shadow-lg shadow-blue-500/20 transition duration-200"
+            >
+              Request FOB / CIF Quotation
+            </a>
+            <a 
+              href="https://wa.me/8613570855813" 
+              target="_blank"
+              rel="noopener noreferrer"
+              class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold text-xs uppercase tracking-wider px-6 py-4 rounded-xl transition duration-200 flex items-center gap-2"
+            >
+              <span>Instant WhatsApp Inquiry</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <LeadForm content={leadContent} />
+  <WhatsAppFloating />
+</BaseLayout>

@@ -1,0 +1,67 @@
+---
+import { translations } from '../lib/i18n';
+
+interface Props {
+  currentLang?: string;
+}
+
+const { currentLang = 'en' } = Astro.props;
+const t = translations[currentLang]?.footer || translations['en'].footer;
+---
+
+<footer class="bg-white border-t border-slate-200 text-slate-600 text-base">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
+      
+      <!-- 品牌简介 -->
+      <div class="lg:col-span-2 space-y-4">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-black text-sm">
+            OY
+          </div>
+          <span class="font-black text-lg text-slate-900 tracking-tight">OUYUAN Intelligent</span>
+        </div>
+        <p class="text-slate-500 leading-relaxed max-w-sm">
+          {t.brandDesc}
+        </p>
+      </div>
+
+      <!-- 快速入口 -->
+      <div class="space-y-3">
+        <h4 class="font-bold text-slate-900 uppercase tracking-wider">{t.solutionsTitle}</h4>
+        <ul class="space-y-2">
+          <li><a href={`/${currentLang}/products/`} class="hover:text-blue-600 transition">Dual-Chamber Flagship</a></li>
+          <li><a href={`/${currentLang}/products/`} class="hover:text-blue-600 transition">Commercial Standard</a></li>
+          <li><a href={`/${currentLang}/products/`} class="hover:text-blue-600 transition">Transit Compact Kiosk</a></li>
+        </ul>
+      </div>
+
+      <!-- B2B 资料 -->
+      <div class="space-y-3">
+        <h4 class="font-bold text-slate-900 uppercase tracking-wider">{t.resourcesTitle}</h4>
+        <ul class="space-y-2">
+          <li><a href={`/${currentLang}/about/`} class="hover:text-blue-600 transition">{t.links?.specs || "About Us"}</a></li>
+          <li><a href={`/${currentLang}/partner/`} class="hover:text-blue-600 transition">{t.links?.oemService || "Partner Program"}</a></li>
+          <li><a href={`/${currentLang}/faq/`} class="hover:text-blue-600 transition">FAQ & Support</a></li>
+        </ul>
+      </div>
+
+      <!-- 工厂地址 -->
+      <div class="space-y-3">
+        <h4 class="font-bold text-slate-900 uppercase tracking-wider">{t.corporateTitle}</h4>
+        <p class="text-slate-500 leading-relaxed">{t.address}</p>
+        <p class="text-blue-600 font-semibold">{t.overseasHub}</p>
+      </div>
+
+    </div>
+
+    <!-- 版权声明 -->
+    <div class="mt-12 pt-8 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-slate-400">
+      <div>{t.copyright}</div>
+      <div class="flex items-center gap-6">
+        <span class="hover:text-blue-600 cursor-pointer">{t.links?.privacy || "Privacy Policy"}</span>
+        <span class="hover:text-blue-600 cursor-pointer">{t.links?.terms || "Terms of Service"}</span>
+      </div>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,144 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro'; // 1. 导入重构后的 Hero
+import HowItWorks from '../../components/HowItWorks.astro';
+import ApplicationsGrid from '../../components/ApplicationsGrid.astro';
+import SpecTable from '../../components/SpecTable.astro';
+import TrustBar from '../../components/TrustBar.astro';
+import DownloadCenter from '../../components/DownloadCenter.astro';
+import FAQ from '../../components/FAQ.astro';
+import LeadForm from '../../components/LeadForm.astro';
+import WhatsAppFloating from '../../components/WhatsAppFloating.astro';
+
+import { fetchFromWP, GET_MACHINES_QUERY } from '../../lib/wp';
+import { translations, supportedLanguages } from '../../lib/i18n';
+
+export async function getStaticPaths() {
+  return supportedLanguages.map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params;
+const currentLang = lang || 'en';
+const t = translations[currentLang] || translations['en'];
+
+let machines: any[] = [];
+try {
+  const data = await fetchFromWP(GET_MACHINES_QUERY);
+  machines = data?.posts?.nodes || [];
+} catch (e) {
+  console.error('WP API 连接异常:', e);
+  // 接口异常时的兜底静态数据，确保页面不白屏
+  machines = [
+    {
+      title: "4th Gen Flagship Series OYTK2504-2",
+      slug: "4th-gen-flagship-series-oytk2504-2",
+      machineSpecs: {
+        screenSize: '21.5" HD Touchscreen',
+        chambersCount: 2,
+        washMethod: "Pure Water + UV + Ozone",
+        powerConsumption: "2100W",
+        dimensions: "650x1790x550 mm",
+        netWeight: "115 kg"
+      }
+    }
+  ];
+}
+---
+
+<BaseLayout title={t.seo?.title} description={t.seo?.description} lang={currentLang}>
+<!-- 1. Hero 传递旗舰机特色图 -->
+<Hero 
+  content={t.hero} 
+  currentLang={currentLang}
+  heroImageUrl={machines[0]?.featuredImage?.node?.sourceUrl}
+  heroImageAlt={machines[0]?.featuredImage?.node?.altText || machines[0]?.title}
+/>
+
+<!-- 2. 机型列表卡片动态渲染 -->
+<section id="machines" class="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="text-center max-w-3xl mx-auto mb-16">
+    <h2 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">Commercial Machine Series</h2>
+    <p class="mt-4 text-slate-600">Engineered for high-traffic public installations, self-service petrol kiosks, and fleet operations.</p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    {machines.map((machine) => {
+      const specs = machine.machineSpecs || {};
+      const imgUrl = machine.featuredImage?.node?.sourceUrl;
+      const imgAlt = machine.featuredImage?.node?.altText || machine.title;
+
+      return (
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition duration-300 flex flex-col justify-between group">
+          <div>
+            <!-- 图片区域：有特色图显示图片，无图显示优雅占位 -->
+            <div class="bg-slate-50 border border-slate-100 rounded-xl h-56 flex items-center justify-center p-4 mb-6 relative overflow-hidden">
+              {imgUrl ? (
+                <img 
+                  src={imgUrl} 
+                  alt={imgAlt} 
+                  class="max-h-full max-w-full object-contain drop-shadow-md group-hover:scale-105 transition duration-300"
+                  loading="lazy"
+                />
+              ) : (
+                <div class="text-slate-400 font-mono text-xs text-center">
+                  [ Machine Image: {machine.title} ]
+                </div>
+              )}
+            </div>
+
+            <h3 class="text-xl font-bold text-slate-900 group-hover:text-blue-600 transition">
+              {machine.title}
+            </h3>
+
+            <div class="mt-4 space-y-2 text-xs text-slate-600">
+              <div class="flex justify-between py-1.5 border-b border-slate-100">
+                <span class="text-slate-400">Chambers:</span>
+                <span class="font-semibold text-slate-800">{specs.chambersCount || 1}</span>
+              </div>
+              <div class="flex justify-between py-1.5 border-b border-slate-100">
+                <span class="text-slate-400">Wash Method:</span>
+                <span class="font-semibold text-slate-800">{specs.washMethod || "UV + Ozone"}</span>
+              </div>
+              <div class="flex justify-between py-1.5 border-b border-slate-100">
+                <span class="text-slate-400">Power:</span>
+                <span class="font-semibold text-slate-800">{specs.powerConsumption || "2100W"}</span>
+              </div>
+            </div>
+          </div>
+
+          <a 
+            href={`/${currentLang}/products/${machine.slug}`} 
+            class="mt-6 block text-center bg-blue-50 group-hover:bg-blue-600 text-blue-700 group-hover:text-white font-bold py-3 rounded-xl text-sm transition duration-200 shadow-sm"
+          >
+            View Full Specs & Pricing →
+          </a>
+        </div>
+      );
+    })}
+  </div>
+</section>
+
+  <!-- 3. 工作流程：4 步自动清洗逻辑 -->
+  {t.workflow && <HowItWorks content={t.workflow} />}
+
+  <!-- 4. 4 大核心落地应用场景 -->
+  {t.applications && <ApplicationsGrid content={t.applications} />}
+
+  <!-- 5. 全系技术参数对照表 -->
+  <SpecTable />
+
+  <!-- 6. 工厂硬实力与认证背书 -->
+  {t.trust && <TrustBar content={t.trust} />}
+
+  <!-- 7. B2B 规格书与图纸下载中心 -->
+  {t.resources && <DownloadCenter content={t.resources} />}
+
+  <!-- 8. FAQ 常见问答与 SEO 结构化数据 -->
+  {t.faq && <FAQ content={t.faq} />}
+
+  <!-- 9. 底部询盘留资表单 -->
+  {t.leadForm && <LeadForm content={t.leadForm} />}
+
+  <!-- 10. 悬浮沟通按钮 -->
+  <WhatsAppFloating />
+</BaseLayout>

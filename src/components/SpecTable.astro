@@ -1,0 +1,62 @@
+---
+import { MOCK_MACHINES } from '../lib/mockData';
+---
+<section id="specs" class="py-16 bg-white border-t border-slate-200">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="text-center mb-10">
+      <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">Technical Specifications</h2>
+      <p class="text-slate-500 mt-2">Industrial-grade parameters for high-frequency public usage</p>
+    </div>
+
+    <div class="overflow-x-auto shadow-sm rounded-lg border border-slate-200">
+      <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
+        <thead class="bg-slate-900 text-white">
+          <tr>
+            <th class="py-4 px-6 font-semibold">Model Specs</th>
+            {MOCK_MACHINES.map((m) => (
+              <th class="py-4 px-6 font-semibold">{m.modelNumber}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200 bg-white">
+          <tr>
+            <td class="py-3 px-6 font-medium text-slate-500">Screen Size</td>
+            {MOCK_MACHINES.map((m) => <td class="py-3 px-6 font-semibold text-blue-600">{m.screenSize}</td>)}
+          </tr>
+          <tr class="bg-slate-50">
+            <td class="py-3 px-6 font-medium text-slate-500">Chamber Design</td>
+            {MOCK_MACHINES.map((m) => <td class="py-3 px-6">{m.chambersCount} Chamber(s)</td>)}
+          </tr>
+          <tr>
+            <td class="py-3 px-6 font-medium text-slate-500">Sterilization</td>
+            {MOCK_MACHINES.map((m) => <td class="py-3 px-6">{m.washMethod}</td>)}
+          </tr>
+          <tr class="bg-slate-50">
+            <td class="py-3 px-6 font-medium text-slate-500">Dimensions (D×H×W)</td>
+            {MOCK_MACHINES.map((m) => <td class="py-3 px-6">{m.dimensions}</td>)}
+          </tr>
+          <tr>
+            <td class="py-3 px-6 font-medium text-slate-500">Net Weight</td>
+            {MOCK_MACHINES.map((m) => <td class="py-3 px-6">{m.netWeight}</td>)}
+          </tr>
+          <tr class="bg-slate-50">
+            <td class="py-3 px-6 font-medium text-slate-500">Power Consumption</td>
+            {MOCK_MACHINES.map((m) => <td class="py-3 px-6">{m.powerConsumption}</td>)}
+          </tr>
+          <tr>
+            <td class="py-3 px-6 font-medium text-slate-500">Payment Support</td>
+            {MOCK_MACHINES.map((m) => (
+              <td class="py-3 px-6">
+                <span class="inline-flex gap-1 flex-wrap">
+                  {m.supportedPayments.map(p => (
+                    <span class="text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">{p}</span>
+                  ))}
+                </span>
+              </td>
+            ))}
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

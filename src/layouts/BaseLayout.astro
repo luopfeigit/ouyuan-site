@@ -1,0 +1,48 @@
+---
+import '../styles/global.css';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import { supportedLanguages } from '../lib/i18n';
+
+interface Props {
+  title?: string;
+  description?: string;
+  lang?: string;
+}
+
+const { 
+  title = "Commercial Automatic Helmet Cleaning Machines | OUYUAN", 
+  description = "High-throughput commercial helmet disinfection and cleaning terminals. Factory direct pricing.", 
+  lang = 'en' 
+} = Astro.props;
+
+const currentPath = Astro.url.pathname.replace(/^\/(en|id|zh)/, '') || '/';
+---
+
+<!doctype html>
+<html lang={lang} class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- 多语言 hreflang 声明 -->
+    {supportedLanguages.map((langCode) => (
+      <link 
+        rel="alternate" 
+        hreflang={langCode} 
+        href={`https://ouyuan.id/${langCode}${currentPath}`} 
+      />
+    ))}
+    <link rel="alternate" hreflang="x-default" href={`https://ouyuan.id/en${currentPath}`} />
+  </head>
+  <body class="min-h-screen bg-slate-50 text-slate-900 flex flex-col antialiased selection:bg-blue-600 selection:text-white">
+    <Navbar currentLang={lang} />
+    <main class="flex-grow">
+      <slot />
+    </main>
+    <Footer currentLang={lang} />
+  </body>
+</html>

@@ -1,0 +1,139 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import LeadForm from '../../components/LeadForm.astro';
+import WhatsAppFloating from '../../components/WhatsAppFloating.astro';
+import { translations, supportedLanguages } from '../../lib/i18n';
+
+export async function getStaticPaths() {
+  return supportedLanguages.map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params;
+const currentLang = lang || 'en';
+const navContent = translations[currentLang]?.nav || translations['en'].nav;
+const leadContent = translations[currentLang]?.leadForm || translations['en'].leadForm;
+
+const pageMeta = {
+  en: {
+    title: "Global Partner Program | OUYUAN Helmet Sanitization Terminals",
+    description: "Join OUYUAN's global partner & distributor network for commercial automatic helmet washing kiosks. Factory direct margins, exclusive territorial protection, and full technical support.",
+    badge: "B2B Partnership Program",
+    heading: "Partner with the Pioneer in Automated Helmet Hygiene",
+    subheading: "Expand your portfolio with high-margin, self-service commercial hardware engineered for petrol networks, fleet operators, and transit authorities.",
+    cards: [
+      {
+        icon: "🌍",
+        title: "Exclusive Regional Distribution",
+        desc: "Secure exclusive territorial agency rights with direct factory pricing, lead-sharing, and project bidding protection.",
+      },
+      {
+        icon: "🛠️",
+        title: "OEM / ODM Custom Engineering",
+        desc: "Tailor kiosks to local market standards with bespoke RAL body paint, local payment terminal integration, and localized firmware.",
+      },
+      {
+        icon: "📦",
+        title: "Spare Parts & Technical SLA",
+        desc: "Comprehensive warranty backed by modular replacement components, wiring diagrams, and direct engineering escalation.",
+      },
+    ],
+  },
+  id: {
+    title: "Program Kemitraan Global | Kios Sanitasi Helm Otomatis OUYUAN",
+    description: "Bergabunglah dengan jaringan distributor & mitra global OUYUAN untuk kios cuci helm otomatis komersial. Margin langsung pabrik dan perlindungan wilayah.",
+    badge: "Program Kemitraan B2B",
+    heading: "Bermitra dengan Pelopor Sanitasi Helm Otomatis",
+    subheading: "Perluas portofolio bisnis Anda dengan mesin swalayan berkeuntungan tinggi untuk jaringan SPBU, armada logistik, dan hub transportasi.",
+    cards: [
+      {
+        icon: "🌍",
+        title: "Distribusi Eksklusif Wilayah",
+        desc: "Dapatkan hak keagenan eksklusif wilayah dengan harga langsung pabrik dan perlindungan tender proyek.",
+      },
+      {
+        icon: "🛠️",
+        title: "Rekayasa Kustom OEM / ODM",
+        desc: "Sesuaikan mesin dengan kebutuhan lokal: warna bodi khusus, integrasi sistem QRIS/EDC, dan firmware berbahasa Indonesia.",
+      },
+      {
+        icon: "📦",
+        title: "Suku Cadang & Dukungan Teknis",
+        desc: "Garansi komersial didukung modul komponen siap ganti, skema kabel, dan dukungan langsung teknisi pabrik.",
+      },
+    ],
+  },
+  zh: {
+    title: "全球合作伙伴计划 | 欧源智能商用头盔洗消终端",
+    description: "加入欧源商用全自动头盔清洗机全球合作伙伴与经销商网络。享源头工厂批发底价、区域独家保护及全流程技术工程支持。",
+    badge: "B2B 渠道招募",
+    heading: "携手全自动头盔智能消杀开创者",
+    subheading: "为加油站网络、即时配送车队及交通枢纽提供高回报的无人自助商业设备，抢占蓝海增值市场。",
+    cards: [
+      {
+        icon: "🌍",
+        title: "区域独家代理保护",
+        desc: "获得严格的区域代理授权、工厂直接出厂底价、本地工程项目报备与投标资质支持。",
+      },
+      {
+        icon: "🛠️",
+        title: "OEM / ODM 深度定制",
+        desc: "根据当地标准定制专属钣金配色、企业 Logo 激光打标、本地化支付读卡器及软件系统界面。",
+      },
+      {
+        icon: "📦",
+        title: "备件储备与技术保障",
+        desc: "全模块化设计，提供充足的原厂易损备件库、电路原理图与工程师一对一技术对接。",
+      },
+    ],
+  },
+};
+
+const content = pageMeta[currentLang] || pageMeta['en'];
+---
+
+<BaseLayout title={content.title} description={content.description} lang={currentLang}>
+  <!-- 1. Hero 招商主视觉 -->
+  <section class="relative bg-slate-950 text-white pt-24 pb-16 overflow-hidden border-b border-slate-800">
+    <div class="absolute inset-0 bg-[linear-gradient(to_right,#1e293b15_1px,transparent_1px),linear-gradient(to_bottom,#1e293b15_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none"></div>
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[32rem] h-[32rem] bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+      <span class="inline-block bg-blue-600/20 text-blue-400 border border-blue-500/30 text-xs font-bold uppercase tracking-widest px-3.5 py-1.5 rounded-full mb-4">
+        {content.badge}
+      </span>
+      <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-white max-w-4xl mx-auto leading-tight">
+        {content.heading}
+      </h1>
+      <p class="mt-4 text-base sm:text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
+        {content.subheading}
+      </p>
+    </div>
+  </section>
+
+  <!-- 2. 三大核心合作优势网格 -->
+  <section class="py-20 bg-slate-900/40 border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {content.cards.map((card) => (
+          <div class="bg-slate-900 border border-slate-800 rounded-3xl p-8 hover:border-blue-500/40 transition duration-300 flex flex-col justify-between">
+            <div>
+              <div class="text-3xl mb-4">{card.icon}</div>
+              <h2 class="text-xl font-bold text-white mb-3 tracking-tight">{card.title}</h2>
+              <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">{card.desc}</p>
+            </div>
+            <div class="mt-8 pt-4 border-t border-slate-800/80">
+              <a href="#contact-form" class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-400 hover:text-blue-300 transition">
+                <span>{navContent.contact || "Inquire"}</span>
+                <span>→</span>
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. 商业线索表单与悬浮按钮 -->
+  <LeadForm content={leadContent} />
+  <WhatsAppFloating />
+</BaseLayout>

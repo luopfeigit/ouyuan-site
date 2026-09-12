@@ -1,0 +1,60 @@
+---
+interface Props {
+  content: {
+    badge: string;
+    title: string;
+    subtitle: string;
+    stats: Array<{ label: string; value: string }>;
+    certifications: Array<{ name: string; desc: string }>;
+  };
+}
+
+const { content } = Astro.props;
+---
+
+<section class="py-20 bg-slate-900 text-white border-t border-slate-800">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center max-w-3xl mx-auto mb-16">
+      <span class="inline-block bg-blue-500/20 text-blue-300 border border-blue-400/30 text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full mb-4">
+        {content.badge}
+      </span>
+      <h2 class="text-3xl sm:text-4xl font-black text-white tracking-tight">
+        {content.title}
+      </h2>
+      <p class="mt-4 text-base text-slate-400 leading-relaxed">
+        {content.subtitle}
+      </p>
+    </div>
+
+    <!-- 生产硬实力数据指标 -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
+      {content.stats.map((stat) => (
+        <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-6 text-center">
+          <div class="text-3xl sm:text-4xl font-black text-blue-400 font-mono mb-2">
+            {stat.value}
+          </div>
+          <div class="text-xs sm:text-sm text-slate-400 font-medium">
+            {stat.label}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- 权威认证与合规标准网格 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {content.certifications.map((cert) => (
+        <div class="bg-slate-800/40 border border-slate-700/50 rounded-xl p-6 flex flex-col justify-between hover:border-blue-500/50 transition">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm">
+              ✓
+            </span>
+            <h3 class="font-bold text-white text-base">{cert.name}</h3>
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            {cert.desc}
+          </p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
