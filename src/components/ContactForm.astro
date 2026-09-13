@@ -1,0 +1,98 @@
+---
+// src/components/ContactForm.astro
+// 将 123 替换为你后台真实的 Contact Form 7 ID
+const WP_FORM_ID = "92ab811"; 
+const WP_API_URL = import.meta.env.PUBLIC_WORDPRESS_URL || "https://mediumslateblue-dinosaur-305649.hostingersite.com/";
+---
+
+<form id="inquiry-form" class="space-y-4">
+  <div>
+    <input 
+      type="text" 
+      name="your-name" 
+      placeholder="Your Name *" 
+      required 
+      class="w-full border p-2 rounded" 
+    />
+  </div>
+  <div>
+    <input 
+      type="email" 
+      name="your-email" 
+      placeholder="Your Email *" 
+      required 
+      class="w-full border p-2 rounded" 
+    />
+  </div>
+  <div>
+    <input 
+      type="text" 
+      name="your-phone" 
+      placeholder="WhatsApp / Phone" 
+      class="w-full border p-2 rounded" 
+    />
+  </div>
+  <div>
+    <textarea 
+      name="your-message" 
+      rows="4" 
+      placeholder="Your Requirements or Message *" 
+      required 
+      class="w-full border p-2 rounded"
+    ></textarea>
+  </div>
+
+  <button 
+    type="submit" 
+    id="submit-btn" 
+    class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition"
+  >
+    Send Message
+  </button>
+  
+  <div id="form-feedback" class="hidden mt-2 text-sm font-medium"></div>
+</form>
+
+<script define:vars={{ WP_FORM_ID, WP_API_URL }}>
+  const form = document.getElementById('inquiry-form');
+  const feedback = document.getElementById('form-feedback');
+  const btn = document.getElementById('submit-btn');
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    btn.disabled = true;
+    btn.innerText = 'Submitting...';
+    feedback.classList.add('hidden');
+
+    const formData = new FormData(form);
+    // Contact Form 7 接收要求带上 _wpcf7 标识表单 ID
+    formData.append('_wpcf7', WP_FORM_ID);
+    formData.append('_wpcf7_unit_tag', `wpcf7-f${WP_FORM_ID}-o1`);
+
+    try {
+      const response = await fetch(`${WP_API_URL}/wp-json/contact-form-7/v1/contact-forms/${WP_FORM_ID}/feedback`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      feedback.classList.remove('hidden');
+      if (data.status === 'mail_sent') {
+        feedback.className = 'text-green-600 mt-2';
+        feedback.innerText = 'Thank you! Your inquiry has been sent successfully.';
+        form.reset();
+      } else {
+        feedback.className = 'text-red-600 mt-2';
+        feedback.innerText = data.message || 'Submission failed, please try again.';
+      }
+    } catch (err) {
+      feedback.classList.remove('hidden');
+      feedback.className = 'text-red-600 mt-2';
+      feedback.innerText = 'Network error. Please contact us via WhatsApp or Email directly.';
+    } finally {
+      btn.disabled = false;
+      btn.innerText = 'Send Message';
+    }
+  });
+</script>
