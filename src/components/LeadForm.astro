@@ -69,7 +69,8 @@ const { content } = Astro.props;
             {content.formTitle}
           </h3>
 
-          <form id="quote-lead-form" action="https://formspree.io/f/mqaeeyrk" method="POST" class="space-y-4">
+          <!--<form id="quote-lead-form" action="https://formspree.io/f/mqaeeyrk" method="POST" class="space-y-4">-->
+           <form id="quote-lead-form" class="space-y-4"></form>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label class="block text-xs font-semibold text-slate-700 mb-1.5">Full Name *</label>
@@ -156,42 +157,50 @@ const { content } = Astro.props;
 </section>
 
 <script is:inline>
-  const form = document.getElementById('quote-lead-form');
-  const submitBtn = document.getElementById('lead-submit-btn');
-  const statusDiv = document.getElementById('lead-status');
+const form = document.getElementById('quote-lead-form');
+const submitBtn = document.getElementById('lead-submit-btn');
+const statusDiv = document.getElementById('lead-status');
 
-  if (form) {
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      if (!submitBtn || !statusDiv) return;
+// 替换为你的线上 WordPress 实际地址与 Contact Form 7 的表单 ID
+const WP_URL = "https://mediumslateblue-dinosaur-305649.hostingersite.com";
+const WP_FORM_ID = "92ab811"; 
 
-      const originalText = submitBtn.innerText;
-      submitBtn.innerText = 'Submitting...';
-      submitBtn.setAttribute('disabled', 'true');
+if (form) {
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!submitBtn || !statusDiv) return;
 
-      try {
-        const formData = new FormData(form);
-        const res = await fetch(form.action, {
-          method: 'POST',
-          body: formData,
-          headers: { 'Accept': 'application/json' }
-        });
+    const originalText = submitBtn.innerText;
+    submitBtn.innerText = 'Submitting...';
+    submitBtn.setAttribute('disabled', 'true');
 
-        if (res.ok) {
-          form.reset();
-          statusDiv.innerText = '✓ Inquiry received. We will contact you within 24 hours.';
-          statusDiv.className = 'text-center text-xs pt-2 text-emerald-600 font-bold block';
-        } else {
-          statusDiv.innerText = 'Error submitting inquiry. Please email sales@ouyuan.id directly.';
-          statusDiv.className = 'text-center text-xs pt-2 text-rose-600 font-bold block';
-        }
-      } catch (err) {
-        statusDiv.innerText = 'Network error. Please email sales@ouyuan.id directly.';
+    try {
+      const formData = new FormData(form);
+      formData.append('_wpcf7', WP_FORM_ID);
+      formData.append('_wpcf7_unit_tag', `wpcf7-f${WP_FORM_ID}-o1`);
+
+      const res = await fetch(`${WP_URL}/wp-json/contact-form-7/v1/contact-forms/${WP_FORM_ID}/feedback`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (data.status === 'mail_sent') {
+        form.reset();
+        statusDiv.innerText = '✓ Inquiry received. We will contact you within 24 hours.';
+        statusDiv.className = 'text-center text-xs pt-2 text-emerald-600 font-bold block';
+      } else {
+        statusDiv.innerText = data.message || 'Error submitting inquiry. Please email sales@ouyuan.id directly.';
         statusDiv.className = 'text-center text-xs pt-2 text-rose-600 font-bold block';
-      } finally {
-        submitBtn.innerText = originalText;
-        submitBtn.removeAttribute('disabled');
       }
-    });
-  }
+    } catch (err) {
+      statusDiv.innerText = 'Network error. Please email sales@ouyuan.id directly.';
+      statusDiv.className = 'text-center text-xs pt-2 text-rose-600 font-bold block';
+    } finally {
+      submitBtn.innerText = originalText;
+      submitBtn.removeAttribute('disabled');
+    }
+  });
+}
 </script>
